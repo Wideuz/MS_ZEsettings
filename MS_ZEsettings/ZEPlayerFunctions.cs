@@ -73,7 +73,6 @@ namespace MS_ZEsettings
         public bool Init()
         {
             _prefs = new Prefs(_sharedSystem,_modSharp);
-            _prefs.Init();
 
             _stopSound = new StopSound(_clientManager, _transmitManager, _modSharp, _prefs);
             _shake = new Shake(_modSharp, _clientManager, _hookManager, _sharedSystem.GetEntityManager(), _prefs);

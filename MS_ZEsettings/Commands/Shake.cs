@@ -1,5 +1,6 @@
 ﻿using MS_ZEsettings.Preferences;
 using Sharp.Shared;
+using Sharp.Shared.Definition;
 using Sharp.Shared.Enums;
 using Sharp.Shared.HookParams;
 using Sharp.Shared.Managers;
@@ -83,7 +84,7 @@ namespace MS_ZEsettings.Commands
             // 顯示提示
             client.GetPlayerController()?.Print(
                 command.ChatTrigger ? HudPrintChannel.Chat : HudPrintChannel.Console,
-                $"[NoShake] {(next ? "Enabled" : "Disabled")}"
+                $" {ChatColor.Red}[NoShake] {ChatColor.White}:{(next ? "Enabled" : "Disabled")}"
             );
 
             return ECommandAction.Stopped;
@@ -101,7 +102,7 @@ namespace MS_ZEsettings.Commands
             // 顯示提示
             client.GetPlayerController()?.Print(
                 HudPrintChannel.Chat,
-                $"[NoShake] {(disabled ? "Enabled" : "Disabled")}"
+                $" {ChatColor.Red}[NoShake] {ChatColor.White}:{(disabled ? "Enabled" : "Disabled")}"
             );
         }
 

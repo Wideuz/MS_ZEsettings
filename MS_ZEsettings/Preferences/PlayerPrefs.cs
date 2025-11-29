@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-using MS_ZEsettings.Commands;
-using Sharp.Modules.ClientPreferences.Shared;
+﻿using Sharp.Modules.ClientPreferences.Shared;
 using Sharp.Shared;
 using Sharp.Shared.Definition;
 using Sharp.Shared.Enums;
@@ -35,11 +32,6 @@ namespace MS_ZEsettings.Preferences
             _modSharp = modSharp;
         }
 
-        public bool Init()
-        {
-            // 如果有需要初始化的邏輯可以放這裡
-            return true;
-        }
 
         public void Shutdown()
         {
