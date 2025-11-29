@@ -104,10 +104,10 @@ namespace MS_ZEsettings
 
             _prefs?.WhenAllModulesLoaded();
 
-            _clientManager.InstallCommandCallback("stopsound", _stopSound!.OnStopSoundCommand);
-            _clientManager.InstallCommandCallback("shake", _shake!.OnShakeCommand);
-            _clientManager.InstallCommandCallback("weapon", _weaponSound!.OnWeaponCommand);
-            _clientManager.InstallCommandCallback("footstep", _weaponSound!.OnFootStepCommand);
+            _stopSound!.Init();
+            _shake!.Init();
+            _weaponSound!.Init();
+            
         }
 
         public void PostInit()
@@ -120,10 +120,9 @@ namespace MS_ZEsettings
             _clientManager.RemoveClientListener(_clientListener!);
             _modSharp.RemoveGameListener(_gameListener!);
 
-            _clientManager.RemoveCommandCallback("stopsound", _stopSound!.OnStopSoundCommand);
-            _clientManager.RemoveCommandCallback("shake", _shake!.OnShakeCommand);
-            _clientManager.RemoveCommandCallback("weapon", _weaponSound!.OnWeaponCommand);
-            _clientManager.RemoveCommandCallback("footstep", _weaponSound!.OnFootStepCommand);
+            _stopSound!.Shutdown();
+            _shake!.Shutdown();
+            _weaponSound!.Shutdown();
 
             _stopSound = null;
             _shake = null;

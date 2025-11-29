@@ -53,7 +53,7 @@ namespace MS_ZEsettings.Preferences
 
         public void WhenAllModulesLoaded()
         {
-            _clientPrefsInterface = _moduleManager.GetOptionalSharpModuleInterface<IClientPreference>(IClientPreference.Identity);
+            _clientPrefsInterface = _moduleManager.GetRequiredSharpModuleInterface<IClientPreference>(IClientPreference.Identity);
             if (_clientPrefsInterface?.Instance is { } instance)
             {
                 _callback = instance.ListenOnLoad(OnCookieLoad);
