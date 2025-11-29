@@ -1,4 +1,5 @@
-﻿using Sharp.Shared;
+﻿using MS_ZEsettings.Preferences;
+using Sharp.Shared;
 using Sharp.Shared.Enums;
 using Sharp.Shared.HookParams;
 using Sharp.Shared.Managers;
@@ -14,16 +15,18 @@ namespace MS_ZEsettings.Commands
         private readonly IClientManager _clients;
         private readonly IHookManager _hooks;
         private readonly IEntityManager _entities;
+        private readonly Prefs _prefs;
 
         // 玩家狀態 (是否停用震動效果)
         private readonly bool[] _noShakeFlags = new bool[65];
 
-        public Shake(IModSharp modSharp, IClientManager clients, IHookManager hooks, IEntityManager entities)
+        public Shake(IModSharp modSharp, IClientManager clients, IHookManager hooks, IEntityManager entities, Prefs prefs)
         {
             _modSharp = modSharp;
             _clients = clients;
             _hooks = hooks;
             _entities = entities;
+            _prefs = prefs;
         }
 
         // 初始化
@@ -63,22 +66,27 @@ namespace MS_ZEsettings.Commands
         }
 
         // 指令邏輯
-        private ECommandAction OnShakeCommand(IGameClient client, StringCommand command)
+        public ECommandAction OnShakeCommand(IGameClient client, StringCommand command)
         {
-            if (client == null || !client.IsValid)
-                return ECommandAction.Stopped;
+            bool current = _prefs.GetCachedPreference(client.SteamId, "NoShake");
+            bool next = !current;
 
-            // 切換狀態
-            _noShakeFlags[client.Slot] = !_noShakeFlags[client.Slot];
+            // 更新偏好 (寫入 cookie)
+            _prefs.SetPreference(client, "NoShake", next);
 
-            // 顯示提示 (你可以自行改成 HUD 或 Console)
+            // 更新快取
+            _prefs.UpdateCachedPreference(client.SteamId, "NoShake", next);
+
+            // 顯示提示
             client.GetPlayerController()?.Print(
                 command.ChatTrigger ? HudPrintChannel.Chat : HudPrintChannel.Console,
-                $"[NoShake] {(_noShakeFlags[client.Slot] ? "Enabled" : "Disabled")}"
+                $"[NoShake] {(next ? "Enabled" : "Disabled")}"
             );
 
             return ECommandAction.Stopped;
         }
+
+
     }
 }
 

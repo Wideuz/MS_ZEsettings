@@ -1,4 +1,5 @@
-﻿using Sharp.Shared;
+﻿using MS_ZEsettings.Preferences;
+using Sharp.Shared;
 using Sharp.Shared.Enums;
 using Sharp.Shared.HookParams;
 using Sharp.Shared.Managers;
@@ -14,6 +15,7 @@ namespace MS_StopMiscSound
         private readonly IHookManager _hooks;
         private readonly bool[] _weaponSounds = new bool[PlayerSlot.MaxPlayerSlot];
         private readonly bool[] _footSteps = new bool[PlayerSlot.MaxPlayerSlot];
+        private readonly Prefs _prefs;
 
         readonly string[] FootStepsArray = [
             "T_Default.StepLeft",
@@ -41,10 +43,11 @@ namespace MS_StopMiscSound
             "Weapon.AutoSemiAutoSwitch"
         ];
 
-        public StopMiscSound(IClientManager clients, IHookManager hooks)
+        public StopMiscSound(IClientManager clients, IHookManager hooks, Prefs prefs)
         {
             _clients = clients;
             _hooks = hooks;
+            _prefs = prefs;
         }
 
         public void Init()
@@ -92,29 +95,49 @@ namespace MS_StopMiscSound
             return new HookReturnValue<SoundOpEventGuid>();
         }
 
-        private ECommandAction OnWeaponCommand(IGameClient client, StringCommand command)
+        public ECommandAction OnWeaponCommand(IGameClient client, StringCommand command)
         {
-            if (client == null || !client.IsValid) return ECommandAction.Stopped;
+            if (client == null || !client.IsValid)
+                return ECommandAction.Stopped;
 
-            _weaponSounds[client.Slot] = !_weaponSounds[client.Slot];
+            // 讀取目前快取狀態
+            bool current = _prefs.GetCachedPreference(client.SteamId, "WeaponSounds");
+            bool next = !current; // 翻轉狀態
 
+            // 更新偏好 (寫入 cookie)
+            _prefs.SetPreference(client, "WeaponSounds", next);
+
+            // 更新快取
+            _prefs.UpdateCachedPreference(client.SteamId, "WeaponSounds", next);
+
+            // 顯示提示
             client.GetPlayerController()?.Print(
                 command.ChatTrigger ? HudPrintChannel.Chat : HudPrintChannel.Console,
-                $"[StopMiscSound] Weapon sounds {(_weaponSounds[client.Slot] ? "Disabled" : "Enabled")}"
+                $"[StopMiscSound] Weapon sounds {(next ? "Disabled" : "Enabled")}"
             );
 
             return ECommandAction.Stopped;
         }
 
-        private ECommandAction OnFootStepCommand(IGameClient client, StringCommand command)
+        public ECommandAction OnFootStepCommand(IGameClient client, StringCommand command)
         {
-            if (client == null || !client.IsValid) return ECommandAction.Stopped;
+            if (client == null || !client.IsValid)
+                return ECommandAction.Stopped;
 
-            _footSteps[client.Slot] = !_footSteps[client.Slot];
+            // 讀取目前快取狀態
+            bool current = _prefs.GetCachedPreference(client.SteamId, "FootSteps");
+            bool next = !current; // 翻轉狀態
 
+            // 更新偏好 (寫入 cookie)
+            _prefs.SetPreference(client, "FootSteps", next);
+
+            // 更新快取
+            _prefs.UpdateCachedPreference(client.SteamId, "FootSteps", next);
+
+            // 顯示提示
             client.GetPlayerController()?.Print(
                 command.ChatTrigger ? HudPrintChannel.Chat : HudPrintChannel.Console,
-                $"[StopMiscSound] Footsteps {(_footSteps[client.Slot] ? "Disabled" : "Enabled")}"
+                $"[StopMiscSound] Footsteps {(next ? "Disabled" : "Enabled")}"
             );
 
             return ECommandAction.Stopped;

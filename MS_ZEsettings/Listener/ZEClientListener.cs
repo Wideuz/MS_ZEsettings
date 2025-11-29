@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using MS_StopMiscSound;
+using MS_ZEsettings.Commands;
+using MS_ZEsettings.Preferences;
 using Sharp.Shared;
 using Sharp.Shared.Definition;
 using Sharp.Shared.Enums;
@@ -16,14 +19,21 @@ namespace MS_ZEsettings.Listener
         private readonly ISharedSystem _sharedSystem;
         private readonly IModSharp _modsharp;
 
+        private readonly Prefs _prefs;
+
         public ZEClientListener(ITransmitManager transmitManager, ILogger<ZEClientListener> logger,
-            ISharedSystem sharedSystem, IModSharp modsharp)
+            ISharedSystem sharedSystem, IModSharp modsharp, Prefs prefs,
+            StopSound stopSound,
+            Shake shake,
+            StopMiscSound weaponSound)
         {
             _transmitManager = transmitManager;
             _logger = logger;
             _sharedSystem = sharedSystem;
             _modsharp = modsharp;
+            _prefs = prefs;
         }
+
 
         public int ListenerVersion => IClientListener.ApiVersion;
         public int ListenerPriority => 0;
@@ -32,13 +42,16 @@ namespace MS_ZEsettings.Listener
 
         public void OnClientConnected(IGameClient client)
         {
-            
+          
         }
 
         public void OnClientPutInServer(IGameClient client)
         {
-            RecipientFilter filter = new RecipientFilter(client);
-            _modsharp.PrintChannelFilter(HudPrintChannel.Chat, $" {ChatColor.Red}[ZEClient] {ChatColor.White} Hello", filter);
+            if (!client.IsValid || client.IsFakeClient)
+                return;
+
+            // 預設值先放 false，等 OnCookieLoad 再更新
+            _prefs.InitializeClient(client.SteamId);
         }
 
         public void OnClientDisconnecting(IGameClient client, NetworkDisconnectionReason reason)
@@ -48,7 +61,7 @@ namespace MS_ZEsettings.Listener
 
         public void OnClientDisconnected(IGameClient client, NetworkDisconnectionReason reason)
         {
-            
+            _prefs.CleanupClient(client.SteamId);
         }
         public void OnClientSettingChanged(IGameClient client)
         {

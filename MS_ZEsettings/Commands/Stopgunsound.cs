@@ -1,6 +1,7 @@
-﻿using Sharp.Shared;
-using Sharp.Shared.Enums;
+﻿using MS_ZEsettings.Preferences;
+using Sharp.Shared;
 using Sharp.Shared.Definition;
+using Sharp.Shared.Enums;
 using Sharp.Shared.Managers;
 using Sharp.Shared.Objects;
 using Sharp.Shared.Types;
@@ -13,15 +14,17 @@ namespace MS_ZEsettings.Commands
         private readonly IClientManager _clients;
         private readonly ITransmitManager _transmits;
         private readonly IModSharp _modsharp;
+        private readonly Prefs _prefs;
 
         // 玩家狀態 (是否停用音效)
-        private readonly bool[] _stopSoundFlags = new bool[PlayerSlot.MaxPlayerSlot];
+        private readonly Dictionary<SteamID, bool> _stopSoundPrefs = new();
 
-        public StopSound(IClientManager clients, ITransmitManager transmits, IModSharp modSharp)
+        public StopSound(IClientManager clients, ITransmitManager transmits, IModSharp modSharp, Prefs prefs)
         {
             _clients = clients;
             _transmits = transmits;
             _modsharp = modSharp;
+            _prefs = prefs;
         }
 
         // 初始化
@@ -39,19 +42,48 @@ namespace MS_ZEsettings.Commands
         // 指令邏輯
         public ECommandAction OnStopSoundCommand(IGameClient client, StringCommand command)
         {
-            if (client == null || !client.IsValid)
+            if (!client.IsValid)
                 return ECommandAction.Stopped;
+
             RecipientFilter filter = new RecipientFilter(client);
 
-            // 切換狀態
-            _stopSoundFlags[client.Slot] = !_stopSoundFlags[client.Slot];
+            // 直接用 SteamId 讀取並翻轉
+            bool current = _stopSoundPrefs.TryGetValue(client.SteamId, out var value) && value;
+            bool next = !current;
 
-            string status = _stopSoundFlags[client.Slot] ? "ON" : "OFF";
-            // 更新傳輸狀態 (這裡只示範 FireBullets，可自行擴充)
-            _transmits.SetTempEntState(BlockTempEntType.FireBullets, client.Slot, !_stopSoundFlags[client.Slot]);
-            _modsharp.PrintChannelFilter(HudPrintChannel.Chat ,$" {ChatColor.Red}[StopSound:Gun] {ChatColor.White}: You are {status} sound", filter);
+            _stopSoundPrefs[client.SteamId] = next;
+            _prefs.SetPreference(client, "StopSound", next);
+
+            string status = next ? "Mute" : "Unmute";
+            _transmits.SetTempEntState(BlockTempEntType.FireBullets, client.Slot, next);
+            _modsharp.PrintChannelFilter(HudPrintChannel.Chat,
+                $" {ChatColor.Red}[StopSound:Gun] {ChatColor.White}: You {status} sound", filter);
 
             return ECommandAction.Stopped;
+        }
+
+        public void ApplyStopSound(IGameClient client)
+        {
+            if (!client.IsValid)
+                return;
+
+            // 從偏好讀取 StopSound 狀態，預設 false
+            bool enabled = _prefs.GetPreference(client, "StopSound", false);
+
+            if (enabled)
+            {
+                RecipientFilter filter = new RecipientFilter(client);
+
+                // 更新傳輸狀態 (阻止 FireBullets TempEnt)
+                _transmits.SetTempEntState(BlockTempEntType.FireBullets, client.Slot, true);
+
+                // 顯示提示訊息
+                _modsharp.PrintChannelFilter(
+                    HudPrintChannel.Chat,
+                    $" {ChatColor.Red}[StopSound:Gun] {ChatColor.White}: You Mute sound (applied from prefs)",
+                    filter
+                );
+            }
         }
     }
 }
