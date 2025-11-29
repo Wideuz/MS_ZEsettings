@@ -11,16 +11,12 @@ namespace MS_ZEsettings.Commands
 {
     public class Shake
     {
-        private readonly IModSharp _modSharp;
-        private readonly IClientManager _clients;
-        private readonly IHookManager _hooks;
-        private readonly IEntityManager _entities;
-        private readonly Prefs _prefs;
-
-        // 玩家狀態 (是否停用震動效果)
-        private readonly bool[] _noShakeFlags = new bool[65];
-
-        public Shake(IModSharp modSharp, IClientManager clients, IHookManager hooks, IEntityManager entities, Prefs prefs)
+        public Shake(
+            IModSharp modSharp,
+            IClientManager clients,
+            IHookManager hooks,
+            IEntityManager entities,
+            Prefs prefs)
         {
             _modSharp = modSharp;
             _clients = clients;
@@ -29,7 +25,14 @@ namespace MS_ZEsettings.Commands
             _prefs = prefs;
         }
 
-        // 初始化
+        private readonly bool[] _noShakeFlags = new bool[PlayerSlot.MaxPlayerSlot];
+        private readonly IModSharp _modSharp;
+        private readonly IClientManager _clients;
+        private readonly IHookManager _hooks;
+        private readonly IEntityManager _entities;
+        private readonly Prefs _prefs;
+
+
         public void Init()
         {
             _hooks.PostEventAbstract.InstallHookPre(OnShakeMessage);

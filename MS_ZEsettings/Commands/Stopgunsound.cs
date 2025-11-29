@@ -80,7 +80,7 @@ namespace MS_ZEsettings.Commands
                 // 顯示提示訊息
                 _modsharp.PrintChannelFilter(
                     HudPrintChannel.Chat,
-                    $" {ChatColor.Red}[StopSound:Gun] {ChatColor.White}: You Mute sound (applied from prefs)",
+                    $" {ChatColor.Red}[StopSound:Gun] {ChatColor.White}: You Mute sound",
                     filter
                 );
             }

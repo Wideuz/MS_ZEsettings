@@ -21,7 +21,7 @@ namespace MS_ZEsettings
 {
     public sealed class ZEPlayerFunctions : IModSharpModule 
     {
-        public string DisplayName => "Leader";
+        public string DisplayName => "PlayerSettings";
         public string DisplayAuthor => "Widez";
 
         private readonly ILogger<ZEPlayerFunctions> _logger;
