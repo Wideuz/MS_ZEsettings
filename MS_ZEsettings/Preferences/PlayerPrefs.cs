@@ -72,11 +72,11 @@ namespace MS_ZEsettings.Preferences
 
             RecipientFilter filter = new RecipientFilter(client);
 
-            // ✅ 在這裡檢查快取並輸出訊息
+            
             bool stopSoundEnabled = GetCachedPreference(client.SteamId, "StopSound");
             _modSharp.PrintChannelFilter(HudPrintChannel.Chat,
                 $" {ChatColor.Red}[Prefs] {ChatColor.White} StopSound = {stopSoundEnabled}", filter);
-            // 🔔 通知外部：偏好已載入，可以套用
+            
             PreferencesApplied?.Invoke(client);
         }
 
