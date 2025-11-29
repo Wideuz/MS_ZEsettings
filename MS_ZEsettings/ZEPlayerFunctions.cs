@@ -83,7 +83,13 @@ namespace MS_ZEsettings
             {
                 if (_prefs.GetCachedPreference(client.SteamId, "StopSound"))
                     _stopSound.ApplyStopSound(client);
-                
+
+                if (_prefs.GetCachedPreference(client.SteamId, "NoShake"))
+                    _shake.ApplyShake(client);
+
+                if (_prefs.GetCachedPreference(client.SteamId, "WeaponSounds") ||
+                    _prefs.GetCachedPreference(client.SteamId, "FootSteps"))
+                    _weaponSound.ApplyMiscSound(client);
             };
 
             _clientListener = new ZEClientListener(_transmitManager,

@@ -142,6 +142,23 @@ namespace MS_StopMiscSound
 
             return ECommandAction.Stopped;
         }
+
+        public void ApplyMiscSound(IGameClient client)
+        {
+            if (!client.IsValid)
+                return;
+
+            bool weaponDisabled = _prefs.GetCachedPreference(client.SteamId, "WeaponSounds");
+            bool footstepDisabled = _prefs.GetCachedPreference(client.SteamId, "FootSteps");
+
+            _weaponSounds[client.Slot] = weaponDisabled;
+            _footSteps[client.Slot] = footstepDisabled;
+
+            client.GetPlayerController()?.Print(
+                HudPrintChannel.Chat,
+                $"[StopMiscSound] Weapon={weaponDisabled}, Footsteps={footstepDisabled}"
+            );
+        }
     }
 }
 

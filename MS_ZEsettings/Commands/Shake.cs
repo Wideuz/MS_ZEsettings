@@ -88,7 +88,22 @@ namespace MS_ZEsettings.Commands
 
             return ECommandAction.Stopped;
         }
+        public void ApplyShake(IGameClient client)
+        {
+            if (!client.IsValid)
+                return;
 
+            bool disabled = _prefs.GetCachedPreference(client.SteamId, "NoShake");
+
+            // 更新快取陣列
+            _noShakeFlags[client.Slot] = disabled;
+
+            // 顯示提示
+            client.GetPlayerController()?.Print(
+                HudPrintChannel.Chat,
+                $"[NoShake] {(disabled ? "Enabled" : "Disabled")}"
+            );
+        }
 
     }
 }
