@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using MS_StopMiscSound;
 using MS_ZEsettings.Commands;
 using MS_ZEsettings.Preferences;
 using Sharp.Shared;

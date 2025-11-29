@@ -7,7 +7,7 @@ using Sharp.Shared.Objects;
 using Sharp.Shared.Types;
 using Sharp.Shared.Units;
 
-namespace MS_StopMiscSound
+namespace MS_ZEsettings.Commands
 {
     public class StopMiscSound
     {
